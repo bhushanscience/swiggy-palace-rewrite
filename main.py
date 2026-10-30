@@ -14,7 +14,7 @@ from telegram.ext import (
 import db
 from config import BOT_TOKEN, PORT
 from handlers import (
-    start, admin_command, setpaymentinfo_command, callback_router,
+    start, admin_command, setpaymentinfo_command, setcharge_command, callback_router,
     photo_router, text_router, cancel, help_command
 )
 
@@ -47,6 +47,7 @@ async def run():
     telegram_app.add_handler(CommandHandler("help", help_command))
     telegram_app.add_handler(CommandHandler("cancel", cancel))
     telegram_app.add_handler(CommandHandler("setpaymentinfo", setpaymentinfo_command))
+    telegram_app.add_handler(CommandHandler("setcharge", setcharge_command))
     telegram_app.add_handler(CallbackQueryHandler(callback_router))
     telegram_app.add_handler(MessageHandler(filters.PHOTO, photo_router))
     telegram_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_router))
