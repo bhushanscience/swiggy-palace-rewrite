@@ -16,3 +16,4 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install -r requirements.txt
       - run: python -m compileall -q config.py db.py handlers.py main.py
+      - run: python -c "import config, db, handlers, main"
