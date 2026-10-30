@@ -14,10 +14,6 @@ services:
       - key: ADMIN_IDS
         sync: false
       - key: DATABASE_PATH
-        value: /var/data/palace.db
+        value: palace.db
       - key: PORT
         value: 10000
-    disk:
-      name: palace-data
-      mountPath: /var/data
-      sizeGB: 1
