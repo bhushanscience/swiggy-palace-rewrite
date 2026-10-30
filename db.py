@@ -83,12 +83,14 @@ async def upsert_user(user):
 
 async def create_order(user_id):
     async with aiosqlite.connect(DATABASE_PATH) as db:
+        await db.execute("BEGIN IMMEDIATE")
         cursor = await db.execute(
             "SELECT COUNT(*) FROM orders WHERE customer_id=? AND status NOT IN ('completed','cancelled')",
             (user_id,)
         )
         count = (await cursor.fetchone())[0]
         if count:
+            await db.rollback()
             return None
         cursor = await db.execute(
             "SELECT COALESCE(MAX(CAST(SUBSTR(id,4) AS INTEGER)),999) + 1 FROM orders"
