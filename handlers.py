@@ -184,13 +184,15 @@ async def callback_router(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def photo_router(update: Update, context: ContextTypes.DEFAULT_TYPE):
     state = context.user_data.get("state")
-    if state != STATE_CART:
-        await update.effective_message.reply_text("No order is currently waiting for a photo.")
-        return
     order_id = context.user_data.get("order_id")
-    if not order_id:
-        await update.effective_message.reply_text("Order session expired. Use /start.")
-        return
+    if state != STATE_CART or not order_id:
+        recent = await db.customer_orders(update.effective_user.id, limit=1)
+        if recent and recent[0]["status"] == "awaiting_cart":
+            order_id = recent[0]["id"]
+            context.user_data.update({"state": STATE_CART, "order_id": order_id})
+        else:
+            await update.effective_message.reply_text("No order is currently waiting for a photo.")
+            return
     file_id = update.effective_message.photo[-1].file_id
     await db.update_order(order_id, cart_file_id=file_id, status="cart_received")
     context.user_data.pop("state", None)
@@ -210,6 +212,18 @@ async def text_router(update: Update, context: ContextTypes.DEFAULT_TYPE):
     value = (message.text or "").strip()
     if not value:
         return
+
+    # Restore the next customer step from the database after a bot restart.
+    if not state:
+        recent = await db.customer_orders(uid, limit=1)
+        if recent:
+            latest = recent[0]
+            if latest["status"] == "awaiting_address":
+                state = STATE_ADDRESS
+                context.user_data.update({"state": state, "order_id": latest["id"]})
+            elif latest["status"] == "payment_pending" and latest["payment_status"] != "verified":
+                state = STATE_UTR
+                context.user_data.update({"state": state, "order_id": latest["id"]})
 
     if state == STATE_ADDRESS:
         order_id = context.user_data.get("order_id")
