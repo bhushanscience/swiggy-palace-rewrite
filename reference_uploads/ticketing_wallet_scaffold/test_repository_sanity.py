@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class RepositorySanityTests(unittest.TestCase):
     def read(self, name):
-        return (ROOT / name).read_text(encoding="utf--8")
+        return (ROOT / name).read_text(encoding="utf-8")
 
     def test_required_schema_features_exist(self):
         schema = self.read("schema.sql").lower()
