@@ -58,6 +58,7 @@ On Windows, activate the virtual environment with `.venv\\Scripts\\activate`.
 
 - `/admin` — review open orders
 - `/setpaymentinfo TEXT` — set the payment instructions shown to customers
+- `/setcharge AMOUNT` — configure the Palace service charge
 - `/cancel` — cancel the current conversation step
 - `/help` — show command help
 
