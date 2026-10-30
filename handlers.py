@@ -66,6 +66,22 @@ async def setpaymentinfo_command(update: Update, context: ContextTypes.DEFAULT_T
     await db.set_setting("payment_info", value[:1000])
     await update.effective_message.reply_text("✅ Payment instructions saved.")
 
+async def setcharge_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_admin(update.effective_user.id):
+        return
+    if len(context.args) != 1:
+        await update.effective_message.reply_text("Usage: /setcharge 30")
+        return
+    try:
+        charge = float(context.args[0])
+        if charge < 0 or charge > 10000:
+            raise ValueError
+    except ValueError:
+        await update.effective_message.reply_text("Enter a valid charge between 0 and 10000.")
+        return
+    await db.set_setting("palace_charge", charge)
+    await update.effective_message.reply_text(f"✅ Palace charge set to ₹{charge:.2f}.")
+
 async def callback_router(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
